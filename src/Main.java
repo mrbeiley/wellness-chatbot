@@ -1,4 +1,5 @@
 import java.util.Random;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -17,6 +18,15 @@ import net.dv8tion.jda.core.entities.Webhook;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookClientBuilder;
 
+/**
+ * 
+ * @author Michael Beiley
+ * 
+ * 1/19/19
+ * 
+ * Main file for chatbot/API declarations. Declares the JDA, EventListener,
+ * and EventWaiter objects.
+ */
 public class Main {
 	private static JDA api;
 	private static myEventListener eventListener;
@@ -31,15 +41,17 @@ public class Main {
 //		
 	//	CommandClient client = builder.build();
 		
+		// Declare JDA object and EventWaiter object
 		api = new JDABuilder(AccountType.BOT).setToken("NTIyNTI5MTgzMDc5OTg5MjU4.DvMVSQ._uxPAtQ8Jsfut1NyzEkKFbkV_M0").build();
 		EventWaiter waiter = new EventWaiter();
-		
+		api.addEventListener(waiter);
+
+		// Add EventWaiter object to JDA object
 		eventListener = new myEventListener(waiter);
 		api.addEventListener(eventListener);
-		api.addEventListener(waiter);
 //		api.addEventListener(client);
 		
-		sendMessageToUser();
+//		sendMessageToUser(); // method is declared below
 	}
 	
 	// Variables used for sending periodic health reminders to the user

@@ -56,22 +56,22 @@ public class myEventListener extends ListenerAdapter{
 			okayConvo(currentChannel, event.getAuthor());
 		}
 		if(content.startsWith("!sad") || content.startsWith("!lonely")) {
-			
+			sadConvo(currentChannel, event.getAuthor());
 		}
 		if(content.startsWith("!anxious")) {
-			
+			anxiousConvo(currentChannel, event.getAuthor());
 		}
 		if(content.startsWith("!sick")) {
-			
+			sickConvo(currentChannel, event.getAuthor());
 		}
 		if(content.startsWith("!tired")) {
-			
+			tiredConvo(currentChannel, event.getAuthor());
 		}
-		if(content.startsWith("!angry")) {
-			
+		if(content.startsWith("!angry") || content.startsWith("!depressed")) {
+			depressedConvo(currentChannel, event.getAuthor());
 		}
-		if(content.startsWith("!depressed")) {
-			
+		if(content.startsWith("!stressed") || content.startsWith("!overwhelmed")) {
+			stressedConvo(currentChannel, event.getAuthor());
 		}
 	}
 
@@ -155,10 +155,9 @@ public class myEventListener extends ListenerAdapter{
 	private void firstOkay(MessageChannel channel, User user) {
 
 		currentChannel.sendTyping().queue();
-		currentChannel.sendMessage("That sounds like a difficult situation. "
-								   + "Don’t be afraid to reach out to friends or family. "
-								  + "I’m sure they would be more than happy to help.").queueAfter(2, TimeUnit.SECONDS);
-		currentChannel.sendMessage("Now, what's been going well?").queueAfter(5, TimeUnit.SECONDS);
+		currentChannel.sendMessage("That definitely sounds like a tricky one. :/")
+									.queueAfter(2, TimeUnit.SECONDS);
+		currentChannel.sendMessage("On the other hand, what's been going well?").queueAfter(5, TimeUnit.SECONDS);
 		
 		waiter.waitForEvent(MessageReceivedEvent.class, 
 				e -> e.getAuthor().equals(user), 
@@ -176,7 +175,7 @@ public class myEventListener extends ListenerAdapter{
 	private void sadConvo(MessageChannel currentChannel, User user) {
 		currentChannel.sendTyping().queue();
 		currentChannel.sendMessage("Ugh that’s rough, " + user.getName()
-				+ "It’s never fun to feel that way.").queueAfter(2, TimeUnit.SECONDS);
+				+ ". It’s never fun to feel that way.").queueAfter(2, TimeUnit.SECONDS);
 		currentChannel.sendMessage("Is there someone you can "
 				+ "call or text right now? Sometimes all it takes is"
 				+ " being proactive in tough times.").queueAfter(5, TimeUnit.SECONDS);
@@ -208,12 +207,13 @@ public class myEventListener extends ListenerAdapter{
 		currentChannel.sendMessage("I’m so sorry, " + user.getName() +
 				", that’s always rough. Remember there are a few simple "
 				+ "techniques to help combat anxiousness. One of which "
-				+ "is listening to calming music. Listening to this "
-				+ "song has been shown to bring down heart rate and "
-				+ "promote relaxation. If you’re curious, read more"
-				+ " about it here! "
-				+ "https://www.lifehacker.com.au/2016/11/this-song-is-scientifically-proven-to-reduce-anxiety-in-8-minutes/")
-				.queueAfter(4, TimeUnit.SECONDS);
+				+ "is listening to calming music.").queueAfter(4, TimeUnit.SECONDS);
+		currentChannel.sendMessage("Listening to this song has been shown "
+				+ "to bring down heart rate and promote relaxation."
+				+ " I'll link the song and an article about it here!").queueAfter(7, TimeUnit.SECONDS);
+		currentChannel.sendMessage(
+				"https://www.lifehacker.com.au/2016/11/this-song-is-scientifically-proven-to-reduce-anxiety-in-8-minutes/")
+				.queueAfter(8, TimeUnit.SECONDS);
 	}
 	
 	private void sickConvo(MessageChannel currentChannel, User user) {
@@ -226,14 +226,59 @@ public class myEventListener extends ListenerAdapter{
 	}
 	
 	private void tiredConvo(MessageChannel currentChannel, User user) {
-		
-	}
-	
-	private void angryConvo(MessageChannel currentChannel, User user) {
-		
+		currentChannel.sendTyping().queue();
+		currentChannel.sendMessage("I’m sorry you’re feeling tired, " + user.getName()
+				+ ". It’s never fun to be low on energy.").queueAfter(2, TimeUnit.SECONDS);
 	}
 	
 	private void depressedConvo(MessageChannel currentChannel, User user) {
+		currentChannel.sendTyping().queue();
+		currentChannel.sendMessage("I’m so sorry, " + user.getName()
+					+ ", that must be tough.").queueAfter(2, TimeUnit.SECONDS);
+		currentChannel.sendMessage("What has you feeling this way?").queueAfter(4, TimeUnit.SECONDS);
 		
+		waiter.waitForEvent(MessageReceivedEvent.class, 
+				e -> e.getAuthor().equals(user), 
+				e -> firstDepressed(e.getChannel(), user),
+				RESPONSE_WAIT_TIME, TimeUnit.SECONDS, () -> currentChannel.sendMessage
+				("try revisiting this later.").queue());
+	}
+	
+	private void firstDepressed(MessageChannel channel, User user) {
+		currentChannel.sendTyping().queue();
+		currentChannel.sendMessage("I see, thanks for sharing that. Remember"
+				+ " that others probably struggle with the same issue as you.\n" + 
+				"If you feel up to it, reach out to a friend or family member "
+				+ "with this problem. I wish you well.\n").queueAfter(3, TimeUnit.SECONDS);
+	}
+
+	private void stressedConvo(MessageChannel currentChannel, User user) {
+		currentChannel.sendTyping().queue();
+		currentChannel.sendMessage("It’s never easy feeling stressed or "
+				+ "overwhelmed.").queueAfter(2, TimeUnit.SECONDS);
+		currentChannel.sendMessage("Is there something you have to do"
+				+ " that’s stressing you out?").queueAfter(4, TimeUnit.SECONDS);
+		
+		waiter.waitForEvent(MessageReceivedEvent.class, 
+				e -> e.getAuthor().equals(user), 
+				e -> firstStressed(e.getChannel(), user, e.getMessage().getContentRaw().toLowerCase()),
+				RESPONSE_WAIT_TIME, TimeUnit.SECONDS, () -> currentChannel.sendMessage
+				("try revisiting this later.").queue());
+	}
+
+	private void firstStressed(MessageChannel channel, User user, String response) {
+		if(response.equals("yes") || response.equals("yea") || response.equals("yeah")){
+			currentChannel.sendTyping().queue();
+			currentChannel.sendMessage("Gotcha. If the task feels daunting or overly "
+					+ "stressful, try breaking it down into more manageable mini-tasks. "
+					+ "This can help make the process feel less stressful and give you "
+					+ "a sense of accomplishment when you finish each task!\n").queueAfter(2, TimeUnit.SECONDS);
+		}
+		else{
+			currentChannel.sendTyping().queue();
+			currentChannel.sendMessage("Ah I see. Try talking with someone about whatever is "
+					+ "stressing you out. Just talking about your feelings can "
+					+ "be a huge relief!\n").queueAfter(2, TimeUnit.SECONDS);
+		}
 	}
 }

@@ -103,7 +103,7 @@ public class MyEventListener extends ListenerAdapter{
 			break;
 		case "!angry":
 			account.add("!angry");
-			stressedConvo(currentChannel, event.getAuthor());
+			depressedConvo(currentChannel, event.getAuthor());
 			break;
 		case "!depressed":
 			account.add("!depressed");

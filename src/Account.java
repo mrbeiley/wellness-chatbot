@@ -60,6 +60,8 @@ public class Account implements Serializable{
 			emotions.put(emotion, 1);
 		else
 			emotions.put(emotion, ++count);
+		
+		System.out.println(emotions.get(emotion));
 	}
 	
 	/**

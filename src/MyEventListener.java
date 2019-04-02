@@ -44,8 +44,9 @@ public class MyEventListener extends ListenerAdapter{
 		}
 		if (account == null) {
 			account = Account.openAccount(event.getAuthor().getName());
-			if(account == null)
+			if(account == null) {
 				account = new Account(event.getAuthor().getName());
+			}
 		}
 		
 		// Store the message sent by the user

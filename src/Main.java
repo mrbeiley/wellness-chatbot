@@ -1,9 +1,10 @@
 import java.io.FileInputStream;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Random;
-
+import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -48,6 +49,7 @@ public class Main {
 		api.addEventListener(eventListener);
 		
 		sendMessageToUser(); // method is declared below
+		
 	}
 	
 	// Variables used for sending periodic health reminders to the user
@@ -69,6 +71,7 @@ public class Main {
 				if(eventListener.currentChannel != null) {
 					int randIndex = rand.nextInt(healthReminders.size());
 					eventListener.currentChannel.sendMessage((CharSequence) healthReminders.get(randIndex)).queue();
+					createMoodGraph();
 	    	    }
 			}
 	    };
@@ -77,8 +80,13 @@ public class Main {
 	    final ScheduledFuture<?> beeperHandle = scheduler.scheduleAtFixedRate(beeper, 0, 10, TimeUnit.SECONDS);
 	    
 	    // Cancels the reminders after 100 seconds
-	//    scheduler.schedule(new Runnable() {
-	 //      public void run() { beeperHandle.cancel(true); }
-	  //   }, 100, TimeUnit.SECONDS);
+	    scheduler.schedule(new Runnable() {
+	       public void run() { beeperHandle.cancel(true); }
+	     }, 100, TimeUnit.SECONDS);
    }
+	
+	public static void createMoodGraph() {
+		MoodGraph graph = new MoodGraph("Mood Graph", "Mood over last 7 days", eventListener.account);
+		
+	}
 } // end of Main.java

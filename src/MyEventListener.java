@@ -123,12 +123,92 @@ public class MyEventListener extends ListenerAdapter{
 					+ "different spelling or different word.").queue();
 		} // end of switch()
 		
+		// The third time the user enters a mood, inform them about the graph
+		if(account.getCount() == 3) {
+			currentChannel.sendTyping().queue();
+			currentChannel.sendMessage("Hey " + event.getAuthor().getName() + "! I'm glad"
+					+ " to see you using the mood response feature!" + " There's even more"
+							+ " I can do, including tracking your moods and graphing them"
+							+ " over time. This is a great way to see how your moods are"
+							+ " fluctuating.").queueAfter(2, TimeUnit.SECONDS);
+			currentChannel.sendMessage("This graph is customizable too." + "You can choose how"
+					+ " long of a period to graph your mood on. By default, we graph your mood"
+					+ " over a week. Would you like to change this? Please enter 'yes' or 'no'.");
+			
+			waiter.waitForEvent(MessageReceivedEvent.class, 
+					e -> e.getAuthor().equals(event.getAuthor()), 
+					e -> setGraphTime(e.getChannel(), event.getAuthor(), e.getMessage().getContentRaw().toLowerCase()),
+					RESPONSE_WAIT_TIME, TimeUnit.SECONDS, () -> currentChannel.sendMessage
+					("if you ever want to change it, simply type '!mood'.").queue());
+		}
+		
+		// Save data to '[username].ser'
 		try {
 			account.saveAccountData();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
+	}
+
+	/**
+	 * 
+	 * @param channel: The MessageChannel used by the bot & users
+	 * @param user: used to confirm the user sent a reply, not anyone else
+	 * @param response: the actual message sent by the user
+	 * 
+	 * This method handles the user response regarding the period of time
+	 * the mood graph covers. If the user says 'yes', the bot will ask them
+	 * how long they wish their graph to cover. If they say no, the bot
+	 * ends the interaction.
+	 */
+	private void setGraphTime(MessageChannel channel, User user, String response) {
+		if(response.equals("yes") || response.equals("yea") || response.equals("yeah")) {
+			channel.sendMessage("Okay great! What would you like to set the time period to?" +
+								"Please choose '3 days', '1 week', '2 weeks', '1 month', "
+								+ "'3 months', '6 months', or '1 year'");
+			waiter.waitForEvent(MessageReceivedEvent.class, 
+					e -> e.getAuthor().equals(user), 
+					e -> setGraphTime2(channel, user, e.getMessage().getContentRaw().toLowerCase()),
+					RESPONSE_WAIT_TIME, TimeUnit.SECONDS, () -> currentChannel.sendMessage
+					("and what are some ways to recreate that success?").queue());
+		}
+		else {
+			channel.sendMessage("Sounds good! Have a nice day!");
+		}
+	}
+
+	private void setGraphTime2(MessageChannel channel, User user, String response) {
+		if(response.contains("3 days")) {
+			account.setDaysInGraph(3);
+		}
+		else if(response.contains("1 week")) {
+			account.setDaysInGraph(7);
+		}
+		else if(response.contains("2 weeks")) {
+			account.setDaysInGraph(14);
+		}
+		else if(response.contains("1 month")) {
+			account.setDaysInGraph(30);
+		}
+		else if(response.contains("3 months")) {
+			account.setDaysInGraph(91);
+		}
+		else if(response.contains("6 months")) {
+			account.setDaysInGraph(182);
+		}
+		else if(response.contains("1 year")){
+			account.setDaysInGraph(365);
+		}
+		else {
+			channel.sendMessage("Sorry, please enter '3 days', '1 week', '2 weeks',"
+					+ " '1 month', '3 months', '6 months' or '1 year'");
+			waiter.waitForEvent(MessageReceivedEvent.class, 
+					e -> e.getAuthor().equals(user), 
+					e -> setGraphTime2(channel, user, e.getMessage().getContentRaw().toLowerCase()),
+					RESPONSE_WAIT_TIME, TimeUnit.SECONDS, () -> currentChannel.sendMessage
+					("You can always set the graph period with the '!graph' command").queue());
+		}
 	}
 
 	/**

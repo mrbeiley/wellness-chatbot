@@ -58,11 +58,8 @@ public class Main {
 	private final static Random rand = new Random();
 	
 	/**
-	 * Can send the user a message at fixed intervals for a fixed amount of time. Currently,
-	 * it sends the message "hi" every 10 seconds for 1 hour.
-	 * 
-	 * Eventually, this should send health reminders to the user. I'll probably implement
-	 * some ArrayList of reminders and rotate through them randomly.
+	 * Sends health reminders to the user. This method rotates through an 
+	 * ArrayList of reminders and displays a random reminder every 10 seconds.
 	 */
 	public static void sendMessageToUser() {
 	     

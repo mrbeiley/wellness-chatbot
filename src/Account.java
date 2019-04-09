@@ -25,15 +25,19 @@ public class Account implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private String username;
-	private ArrayList<Mood> lastThirtyFiveMoods;
+	private ArrayList<Mood> moodList;
 	private HashMap<String, Mood> moods;
+	private int daysInGraph;
+	private int count;
 	
-	// Initialize the Moodss HashMap with all
-	// possible Moodss
+	// Initialize the Moods HashMap with all
+	// possible Moods
 	public Account(String username) {
 		this.username = username;
-		this.lastThirtyFiveMoods = new ArrayList<Mood>(35);
+		this.moodList = new ArrayList<Mood>();
 		this.moods = new HashMap<String, Mood>();
+		this.daysInGraph = 7;
+		this.count = 0;
 		initMoods();
 	}
 	
@@ -65,25 +69,16 @@ public class Account implements Serializable{
 	 * @param Moods - the selected Moods
 	 */
 	public void add(String mood) {
+		
 		// Moods hasn't been initialized/wasn't in constructor originally
 		if(this.moods.get(mood) == null)
 			this.moods.put(mood, new Mood(mood));
 
-		this.moods.get(mood).increment();
-		
-		
-		// Since we're adding the most recent dates at the
-		// BEGINNING of the ArrayList, we must remove the last/oldest
-		// element if we exceed the maximum number of Moods
-		// we want to store for the last week
-		if(lastThirtyFiveMoods.size() == 35) {
-			lastThirtyFiveMoods.remove(34);
-		}
-		
-		lastThirtyFiveMoods.add(0, new Mood(mood));
-		
+		this.moods.get(mood).increment(); 	// increment HashMap
+		moodList.add(0, new Mood(mood)); 	// add new Mood (w/ timestamp) to list
+		count++; 							// increment number of total user responses
 			
-		System.out.println(this.moods.get(mood).getCount());
+		System.out.println(this.moods.get(mood).getCount()); // debugging print
 	}
 	
 	/**
@@ -147,8 +142,8 @@ public class Account implements Serializable{
 		return this.username;
 	}
 
-	public ArrayList<Mood> getLastThirtyFive() {
-		return this.lastThirtyFiveMoods;
+	public ArrayList<Mood> getMoodList() {
+		return this.moodList;
 	}
 
 	
@@ -157,25 +152,37 @@ public class Account implements Serializable{
 	 * the user has recorded over the last 7 days.
 	 * 
 	 * This method uses the Date object to check if the moods
-	 * in lastThirtyFiveMoods are within the last 7 days. If so,
+	 * in moodList are within the last 7 days. If so,
 	 * they are added to the list.
 	 * 
 	 * @return recentMoods - all moods in the last week (max 5 per day)
 	 */
-	public ArrayList<Mood> getRecentMoods() {
+	public ArrayList<Mood> getRecentMoods(int days) {
 		
 		ArrayList<Mood> recentMoods = new ArrayList<Mood>();
 		
 		long DAY_IN_MS = 1000 * 60 * 60 * 24;
-		Date sevenDaysAgo = new Date(System.currentTimeMillis() - (7 * DAY_IN_MS));
+		Date nDaysAgo = new Date(System.currentTimeMillis() - (days * DAY_IN_MS));
 		
-		for(int i=0; i<lastThirtyFiveMoods.size(); i++) {
+		for(int i=0; i<moodList.size(); i++) {
 			
-			if(lastThirtyFiveMoods.get(i).getCreation().after(sevenDaysAgo)) {
-				recentMoods.add(lastThirtyFiveMoods.get(i));
+			if(moodList.get(i).getCreation().after(nDaysAgo)) {
+				recentMoods.add(moodList.get(i));
 			}
 		}
 		
 		return recentMoods;
+	}
+
+	public int getCount() {
+		return this.count;
+	}
+
+	public void setDaysInGraph(int i) {
+		this.daysInGraph = i;
+	}
+	
+	public int getDaysInGraph() {
+		return this.daysInGraph;
 	}
 }

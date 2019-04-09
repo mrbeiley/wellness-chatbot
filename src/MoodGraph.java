@@ -56,7 +56,7 @@ public class MoodGraph extends JFrame{
     @SuppressWarnings("deprecation")
 	private DefaultCategoryDataset createDataset() {
         DefaultCategoryDataset result = new DefaultCategoryDataset();
-        ArrayList<Mood> moods = account.getRecentMoods();
+        ArrayList<Mood> moods = account.getRecentMoods(account.getDaysInGraph());
         
         HashMap<Integer, String> numToDay = new HashMap<Integer, String>();
         numToDay.put(0, "Sun");

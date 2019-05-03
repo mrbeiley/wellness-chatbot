@@ -67,7 +67,7 @@ public class Main {
 			public void run() {
 				if(eventListener.currentChannel != null) {
 					int randIndex = rand.nextInt(healthReminders.size());
-					eventListener.currentChannel.sendMessage((CharSequence) healthReminders.get(randIndex)).queue();
+				//	eventListener.currentChannel.sendMessage((CharSequence) healthReminders.get(randIndex)).queue();
 					createMoodGraph();
 	    	    }
 			}
@@ -83,7 +83,7 @@ public class Main {
    }
 	
 	public static void createMoodGraph() {
-		MoodGraph graph = new MoodGraph("Mood Graph", "Mood over last 7 days", eventListener.account);
+		MoodGraph graph = new MoodGraph("Mood Graph", "Moods over last " + eventListener.account.getDaysInGraph() + " days", eventListener.account);
 		
 	}
 } // end of Main.java

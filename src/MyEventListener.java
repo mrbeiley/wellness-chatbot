@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.*;
@@ -57,6 +59,16 @@ public class MyEventListener extends ListenerAdapter{
 		switch (content) {
 		case "!ping":
 			currentChannel.sendMessage("Pong " + event.getJDA().getPing()).queue();
+			break;
+		case "!help":
+			currentChannel.sendMessage("Hey " + event.getAuthor().getName() + "!"
+										+ " Here is a list of commands you can use:\n\n"
+										+ "!ping to check your ping\n\n"
+										+ "!happy, !reallyhappy, !content, !excited, "
+										+ "!okay, !indifferent, !sad, !lonely, !anxious, !sick"
+										+ ", !tired, !angry, !depressed, !stressed, !overwhelmed\n\n"
+										+ "!mood to change the length of time your mood graph covers\n\n"
+										+ "!therapist to find a therapist perfectly suited for you!").queue();
 			break;
 		case "!happy":
 			account.add("!happy");
@@ -118,13 +130,50 @@ public class MyEventListener extends ListenerAdapter{
 			account.add("!overwhelmed");
 			stressedConvo(currentChannel, event.getAuthor());
 			break;
+		case "!mood":
+			currentChannel.sendTyping().queue();
+			currentChannel.sendMessage("This graph is customizable too." + "You can choose how"
+					+ " long of a period to graph your mood on. By default, we graph your mood"
+					+ " over a week. Type 'yes' if you want to change the time.").queueAfter(3, TimeUnit.SECONDS);
+			waiter.waitForEvent(MessageReceivedEvent.class, 
+					e -> e.getAuthor().equals(event.getAuthor()), 
+					e -> setGraphTime(e.getChannel(), event.getAuthor(), e.getMessage().getContentRaw().toLowerCase()),
+					RESPONSE_WAIT_TIME, TimeUnit.SECONDS, () -> currentChannel.sendMessage
+					("if you ever want to change it, simply type '!mood'.").queue());	
+			break;
+		case "!therapist":
+			String s = null;
+			try {
+				String cmd = "C:\\Users\\mbeil\\Downloads\\anaconda2\\Scripts\\activate.bat";
+				
+				Process p = Runtime.getRuntime().exec(cmd);
+				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		        BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+		            // read the output from the command
+		            System.out.println("Here is the standard output of the command:\n");
+		            while ((s = stdInput.readLine()) != null) {
+		                System.out.println(s);
+		            }
+		            
+		            // read any errors from the attempted command
+		            System.out.println("Here is the standard error of the command (if any):\n");
+		            while ((s = stdError.readLine()) != null) {
+		                System.out.println(s);
+		            }
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			break;
 		default:
-			currentChannel.sendMessage("Sorry, I didn't recognize that emotion. Try using a"
-					+ "different spelling or different word.").queue();
+//			currentChannel.sendMessage("Sorry, I didn't recognize that emotion. Try using a"
+//					+ "different spelling or different word.").queue();
+			break;
 		} // end of switch()
+
 		
 		// The third time the user enters a mood, inform them about the graph
-		if(account.getCount() == 3) {
+		if(account.getCount() == 100) {
 			currentChannel.sendTyping().queue();
 			currentChannel.sendMessage("Hey " + event.getAuthor().getName() + "! I'm glad"
 					+ " to see you using the mood response feature!" + " There's even more"
@@ -133,7 +182,7 @@ public class MyEventListener extends ListenerAdapter{
 							+ " fluctuating.").queueAfter(2, TimeUnit.SECONDS);
 			currentChannel.sendMessage("This graph is customizable too." + "You can choose how"
 					+ " long of a period to graph your mood on. By default, we graph your mood"
-					+ " over a week. Would you like to change this? Please enter 'yes' or 'no'.");
+					+ " over a week. Type '!mood' to change this!").queueAfter(3, TimeUnit.SECONDS);
 			
 			waiter.waitForEvent(MessageReceivedEvent.class, 
 					e -> e.getAuthor().equals(event.getAuthor()), 
@@ -166,7 +215,7 @@ public class MyEventListener extends ListenerAdapter{
 		if(response.equals("yes") || response.equals("yea") || response.equals("yeah")) {
 			channel.sendMessage("Okay great! What would you like to set the time period to?" +
 								"Please choose '3 days', '1 week', '2 weeks', '1 month', "
-								+ "'3 months', '6 months', or '1 year'");
+								+ "'3 months', '6 months', or '1 year'").queue();
 			waiter.waitForEvent(MessageReceivedEvent.class, 
 					e -> e.getAuthor().equals(user), 
 					e -> setGraphTime2(channel, user, e.getMessage().getContentRaw().toLowerCase()),
@@ -181,24 +230,38 @@ public class MyEventListener extends ListenerAdapter{
 	private void setGraphTime2(MessageChannel channel, User user, String response) {
 		if(response.contains("3 days")) {
 			account.setDaysInGraph(3);
+			channel.sendTyping().queue();
+			channel.sendMessage("Great! Your graph will now show the last 3 days of moods!").queueAfter(1, TimeUnit.SECONDS);
 		}
 		else if(response.contains("1 week")) {
 			account.setDaysInGraph(7);
+			channel.sendTyping().queue();
+			channel.sendMessage("Great! Your graph will now show the last week of moods!").queueAfter(1, TimeUnit.SECONDS);
 		}
 		else if(response.contains("2 weeks")) {
 			account.setDaysInGraph(14);
+			channel.sendTyping().queue();
+			channel.sendMessage("Great! Your graph will now show the last 2 weeks of moods!").queueAfter(1, TimeUnit.SECONDS);
 		}
 		else if(response.contains("1 month")) {
 			account.setDaysInGraph(30);
+			channel.sendTyping().queue();
+			channel.sendMessage("Great! Your graph will now show the last month of moods!").queueAfter(1, TimeUnit.SECONDS);
 		}
 		else if(response.contains("3 months")) {
 			account.setDaysInGraph(91);
+			channel.sendTyping().queue();
+			channel.sendMessage("Great! Your graph will now show the last 3 months of moods!").queueAfter(1, TimeUnit.SECONDS);
 		}
 		else if(response.contains("6 months")) {
 			account.setDaysInGraph(182);
+			channel.sendTyping().queue();
+			channel.sendMessage("Great! Your graph will now show the last 6 months of moods!").queueAfter(1, TimeUnit.SECONDS);
 		}
 		else if(response.contains("1 year")){
 			account.setDaysInGraph(365);
+			channel.sendTyping().queue();
+			channel.sendMessage("Great! Your graph will now show the last year of moods!").queueAfter(1, TimeUnit.SECONDS);
 		}
 		else {
 			channel.sendMessage("Sorry, please enter '3 days', '1 week', '2 weeks',"

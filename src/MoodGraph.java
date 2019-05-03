@@ -102,8 +102,8 @@ public class MoodGraph extends JFrame{
         	date += hourToTime.get(moods.get(i).getCreation().getHours());
         	
         		
-        	System.out.println(date);
-        	System.out.println(i);
+       // 	System.out.println(date);
+       // 	System.out.println(i);
         	result.addValue(i*10, "mood", date);
         }
 
